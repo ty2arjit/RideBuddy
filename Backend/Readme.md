@@ -54,7 +54,7 @@ Example Error Response:
     }
   ]
 }
-Request Validation
+**Request Validation**
 The following validation rules are applied in user.routes.js:
 
 email: Must be a valid email address.
