@@ -7,12 +7,12 @@ const Token = process.env.JWT_SECRET;
 
 const userSchema = new mongoose.Schema({
   fullName: {
-    firstname: {
+    firstName: {
       type: String,
       required: true,
       minlength: [2, 'First name must have at least 2 characters'],
     },
-    lastname: {
+    lastName: {
       type: String,
     },
   },
@@ -38,7 +38,7 @@ userSchema.methods.generateAuthToken = function() {
   return token;
 }
 
-userSchema.methods.comparePassword = async function (password) {
+userSchema.methods.comparePassword = async function ( password ) {
   return await bcrypt.compare(password, this.password);
 }
 
