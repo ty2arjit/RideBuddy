@@ -97,3 +97,62 @@ Notes:
 Ensure that express-validator middleware is used to validate the request before calling this function.
 The userModel.hashPassword method is used to securely hash the user's password.
 The user.generateAuthToken method is assumed to generate a JWT for authentication.
+
+
+User Login Documentation
+Endpoint: POST /users/login
+
+Description:
+Authenticates an existing user by verifying email and password. On success, returns a JWT token and the user object.
+
+Request Body
+Content type: application/json
+
+Required fields:
+
+email (string) - must be a valid email address
+password (string) - must be at least 6 characters
+Example:
+{
+  "email": "john.doe@example.com",
+  "password": "securePassword123"
+}
+
+Responses
+200 OK
+Returned when login is successful.
+
+Example:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "_id": "60d0fe4f5311236168a109ca",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john.doe@example.com"
+  }
+}
+
+400 Bad Request
+Returned when validation fails for required fields.
+
+Example:
+{
+  "errors": [
+    {
+      "msg": "Please provide a valid email address",
+      "param": "email",
+      "location": "body"
+    }
+  ]
+}
+
+401 Unauthorized
+Returned when email or password is invalid.
+
+Example:
+{
+  "message": "Invalid email or password"
+}
