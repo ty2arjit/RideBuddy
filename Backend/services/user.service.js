@@ -7,7 +7,7 @@ module.exports.createUser = async ({
     throw new Error('Missing required fields');
   }
 
-  const user = userModel.create({
+  const user = await userModel.create({
     fullName: {
       firstName,
       lastName
