@@ -1,27 +1,146 @@
-### `registerUser`
+# 🚖 RideBuddy Backend API
 
-**Description**:  
-Handles user registration by validating the request, hashing the password, creating a new user, and returning an authentication token.
+<div align="center">
 
-**Method**:  
-`POST`
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge\&logo=nodedotjs\&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge\&logo=express\&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge\&logo=mongodb\&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge\&logo=jsonwebtokens\&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge\&logo=mongoose\&logoColor=white)
 
-**Request Body**:  
-The request body should contain the following fields:
-- `fullName` (object):
-  - `firstName` (string): The first name of the user.
-  - `lastName` (string): The last name of the user.
-- `email` (string): The email address of the user.
-- `password` (string): The password for the user account.
+### Scalable Authentication & User Management Backend
 
-**Response**:  
-- **Success (201)**: Returns a JSON object containing:
-  - `token` (string): The authentication token for the user.
-  - `user` (object): The created user object.
-- **Error (400)**: Returns a JSON object containing:
-  - `errors` (array): An array of validation errors.
+A production-ready backend authentication system built using Node.js, Express, MongoDB, JWT Authentication, and Mongoose.
 
-**Example Request**:
+</div>
+
+---
+
+# 📌 Overview
+
+RideBuddy Backend provides a secure and scalable authentication system for modern web applications. It includes:
+
+* 🔐 JWT-based Authentication
+* 👤 User Registration & Login
+* 🚪 Secure Logout with Token Blacklisting
+* 🛡️ Request Validation using Express Validator
+* 🔒 Password Hashing using Bcrypt
+* ⚡ Modular MVC Architecture
+* 📦 MongoDB Integration using Mongoose
+
+---
+
+# 🏗️ Tech Stack
+
+| Technology        | Purpose            |
+| ----------------- | ------------------ |
+| Node.js           | Backend Runtime    |
+| Express.js        | Web Framework      |
+| MongoDB           | Database           |
+| Mongoose          | ODM for MongoDB    |
+| JWT               | Authentication     |
+| bcrypt            | Password Hashing   |
+| express-validator | Request Validation |
+
+---
+
+# 📂 Project Structure
+
+```bash
+RideBuddy/
+│
+├── controllers/
+│   └── user.controller.js
+│
+├── models/
+│   └── user.model.js
+│
+├── routes/
+│   └── user.routes.js
+│
+├── services/
+│   └── user.service.js
+│
+├── middleware/
+│   └── auth.middleware.js
+│
+├── config/
+│   └── config.js
+│
+├── server.js
+├── package.json
+└── .env
+```
+
+---
+
+# ⚙️ Environment Variables
+
+Create a `.env` file in the root directory.
+
+```env
+PORT=3000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+
+---
+
+# 🚀 Installation & Setup
+
+## 1️⃣ Clone the Repository
+
+```bash
+git clone <your-repository-url>
+cd RideBuddy
+```
+
+## 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+## 3️⃣ Configure Environment Variables
+
+Create a `.env` file and add your credentials.
+
+## 4️⃣ Start the Server
+
+```bash
+npm run dev
+```
+
+Server will start at:
+
+```bash
+http://localhost:3000
+```
+
+---
+
+# 🔐 Authentication API Documentation
+
+---
+
+# 👤 Register User
+
+## Endpoint
+
+```http
+POST /users/register
+```
+
+---
+
+## 📖 Description
+
+Creates a new user account after validating request data, hashing the password, and generating a JWT authentication token.
+
+---
+
+## 🧾 Request Body
+
 ```json
 {
   "fullName": {
@@ -31,98 +150,89 @@ The request body should contain the following fields:
   "email": "john.doe@example.com",
   "password": "securePassword123"
 }
+```
 
-Example Success Response:
+---
 
+## ✅ Validation Rules
+
+| Field              | Validation            |
+| ------------------ | --------------------- |
+| email              | Must be a valid email |
+| fullName.firstName | Minimum 2 characters  |
+| password           | Minimum 6 characters  |
+
+---
+
+## ✅ Success Response — 201 Created
+
+```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "12345",
-    "firstName": "John",
-    "lastName": "Doe",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
     "email": "john.doe@example.com"
   }
 }
+```
 
-Example Error Response:
+---
+
+## ❌ Validation Error — 400 Bad Request
+
+```json
 {
   "errors": [
     {
-      "msg": "Invalid value",
+      "msg": "Please provide a valid email address",
       "param": "email",
       "location": "body"
     }
   ]
 }
-Request Validation
-The following validation rules are applied in user.routes.js:
+```
 
-email: Must be a valid email address.
-fullName.firstName: Must have at least 2 characters.
-password: Must have at least 6 characters.
-Validation errors are returned with a 400 Bad Request status.
+---
 
-How It Works
-Route Definition:
-The /register endpoint is defined in user.routes.js with validation rules using express-validator.
+# 🔑 User Login
 
-Controller Logic:
-The registerUser function in user.controller.js:
+## Endpoint
 
-Validates the request using express-validator.
-Hashes the password using bcrypt.
-Calls the createUser function in user.service.js to save the user in the database.
-Generates a JWT using the generateAuthToken method in user.model.js.
-Returns the token and user details in the response.
+```http
+POST /users/login
+```
 
-Service Layer:
-The createUser function in user.service.js:
+---
 
-Validates required fields.
-Creates a new user using the userModel.
-Model:
-The user.model.js file defines the User schema and includes methods for:
+## 📖 Description
 
-Hashing passwords (hashPassword).
-Comparing passwords (comparePassword).
-Generating JWTs (generateAuthToken).
+Authenticates an existing user by verifying email and password.
 
-Dependencies:
+On successful authentication, the API returns:
 
-express-validator: Used to validate the request body.
-userModel: Provides methods for hashing passwords.
-userService: Handles user creation logic.
-Notes:
+* JWT Token
+* User Object
 
-Ensure that express-validator middleware is used to validate the request before calling this function.
-The userModel.hashPassword method is used to securely hash the user's password.
-The user.generateAuthToken method is assumed to generate a JWT for authentication.
+---
 
+## 🧾 Request Body
 
-User Login Documentation
-Endpoint: POST /users/login
-
-Description:
-Authenticates an existing user by verifying email and password. On success, returns a JWT token and the user object.
-
-Request Body
-Content type: application/json
-
-Required fields:
-
-email (string) - must be a valid email address
-password (string) - must be at least 6 characters
-Example:
+```json
 {
   "email": "john.doe@example.com",
   "password": "securePassword123"
 }
+```
 
-Responses
-200 OK
-Returned when login is successful.
+---
 
-Example:
+## ✅ Success Response — 200 OK
+
+```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
@@ -134,64 +244,228 @@ Example:
     "email": "john.doe@example.com"
   }
 }
+```
 
-400 Bad Request
-Returned when validation fails for required fields.
+---
 
-Example:
-{
-  "errors": [
-    {
-      "msg": "Please provide a valid email address",
-      "param": "email",
-      "location": "body"
-    }
-  ]
-}
+## ❌ Invalid Credentials — 401 Unauthorized
 
-401 Unauthorized
-Returned when email or password is invalid.
-
-Example:
+```json
 {
   "message": "Invalid email or password"
 }
+```
 
+---
 
+# 🚪 User Logout
+
+## Endpoint
+
+```http
 POST /users/logout
-Description:
-Logs out the current user by blacklisting the authentication token and clearing the session cookie. Once logged out, the token can no longer be used to access protected routes (like /profile).
+```
 
-Authentication Required:
-Yes (User must be logged in to log out).
+---
 
-HTTP Method: POST
+## 📖 Description
 
-Request Headers:
+Logs out the authenticated user by blacklisting the JWT token and clearing authentication cookies.
 
-Authorization: Bearer <token> (Optional if using cookies)
-Cookie: token=<token> (Optional if using headers)
+Once logged out:
 
-Responses & Status Codes
-200 OK (Success)
-Returned when the user is successfully logged out.
+* The token becomes invalid
+* Protected routes can no longer be accessed
 
-Example Response:
+---
+
+## 🔒 Authentication Required
+
+Yes ✅
+
+---
+
+## 📨 Request Headers
+
+```http
+Authorization: Bearer <token>
+```
+
+OR
+
+```http
+Cookie: token=<token>
+```
+
+---
+
+## ✅ Success Response — 200 OK
+
+```json
 {
   "message": "Logged out successfully"
 }
+```
 
-401 Unauthorized
-Returned if no valid token is provided in the headers or cookies, or if the token has already been blacklisted.
+---
 
-Example Response:
+## ❌ Unauthorized — 401
+
+```json
 {
   "message": "Unauthorized"
 }
+```
 
-How It Works
-Token Extraction: The server looks for the JWT in the Authorization header or the token cookie.
-Blacklisting: The extracted token is saved into a BlacklistToken collection in MongoDB.
-Token Expiry: The blacklisted token is automatically removed from the database after 24 hours (via TTL index) to keep the database collection clean.
-Cookie Cleanup: The server sends a clearCookie instruction to the browser to remove the stored token cookie.
-Access Control: The authMiddleware checks every incoming request against the BlacklistToken collection. If a match is found, access is denied.
+---
+
+# 🛡️ Authentication Flow
+
+```text
+Client Request
+      ↓
+Request Validation
+      ↓
+Password Hashing
+      ↓
+MongoDB User Creation
+      ↓
+JWT Token Generation
+      ↓
+Authenticated Access
+```
+
+---
+
+# 🔒 Security Features
+
+## ✅ Password Hashing
+
+Passwords are securely hashed using bcrypt before storing them in the database.
+
+---
+
+## ✅ JWT Authentication
+
+JSON Web Tokens are used for stateless authentication.
+
+---
+
+## ✅ Token Blacklisting
+
+Logged-out tokens are stored in a blacklist collection to prevent reuse.
+
+---
+
+## ✅ TTL Index Cleanup
+
+Blacklisted tokens are automatically deleted after expiration.
+
+---
+
+# 🧠 Core Architecture
+
+The backend follows a modular MVC architecture.
+
+## 📌 Controllers
+
+Handle:
+
+* Request validation
+* API response handling
+* Authentication flow
+
+---
+
+## 📌 Services
+
+Contain:
+
+* Business logic
+* Database interaction logic
+
+---
+
+## 📌 Models
+
+Define:
+
+* MongoDB schemas
+* Instance methods
+* Static methods
+
+Example:
+
+```js
+userSchema.methods.generateAuthToken = function () {}
+userSchema.methods.comparePassword = function () {}
+userSchema.statics.hashPassword = function () {}
+```
+
+---
+
+# 📦 Dependencies
+
+```json
+{
+  "bcrypt": "^latest",
+  "dotenv": "^latest",
+  "express": "^latest",
+  "express-validator": "^latest",
+  "jsonwebtoken": "^latest",
+  "mongoose": "^latest",
+  "nodemon": "^latest"
+}
+```
+
+---
+
+# 🧪 API Testing
+
+You can test the APIs using:
+
+* Postman
+* Thunder Client
+* Insomnia
+
+---
+
+# 🌟 Future Improvements
+
+* 🚘 Ride Booking APIs
+* 📍 Real-time Location Tracking
+* 💬 Socket.IO Chat Integration
+* 🧭 Google Maps Integration
+* 👨‍✈️ Captain Authentication System
+* 📱 OTP Verification
+* ☁️ Deployment on AWS / Render / Railway
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+Feel free to fork the repository and submit pull requests.
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+### Arjit Tiwari
+
+Backend Developer | MERN Stack Developer | Problem Solver
+
+---
+
+<div align="center">
+
+### ⭐ If you found this project helpful, give it a star ⭐
+
+</div>
