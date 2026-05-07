@@ -156,3 +156,42 @@ Example:
 {
   "message": "Invalid email or password"
 }
+
+
+POST /users/logout
+Description:
+Logs out the current user by blacklisting the authentication token and clearing the session cookie. Once logged out, the token can no longer be used to access protected routes (like /profile).
+
+Authentication Required:
+Yes (User must be logged in to log out).
+
+HTTP Method: POST
+
+Request Headers:
+
+Authorization: Bearer <token> (Optional if using cookies)
+Cookie: token=<token> (Optional if using headers)
+
+Responses & Status Codes
+200 OK (Success)
+Returned when the user is successfully logged out.
+
+Example Response:
+{
+  "message": "Logged out successfully"
+}
+
+401 Unauthorized
+Returned if no valid token is provided in the headers or cookies, or if the token has already been blacklisted.
+
+Example Response:
+{
+  "message": "Unauthorized"
+}
+
+How It Works
+Token Extraction: The server looks for the JWT in the Authorization header or the token cookie.
+Blacklisting: The extracted token is saved into a BlacklistToken collection in MongoDB.
+Token Expiry: The blacklisted token is automatically removed from the database after 24 hours (via TTL index) to keep the database collection clean.
+Cookie Cleanup: The server sends a clearCookie instruction to the browser to remove the stored token cookie.
+Access Control: The authMiddleware checks every incoming request against the BlacklistToken collection. If a match is found, access is denied.
