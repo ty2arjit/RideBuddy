@@ -27,6 +27,7 @@ RideBuddy Backend provides a secure and scalable authentication system for moder
 * 🔒 Password Hashing using Bcrypt
 * ⚡ Modular MVC Architecture
 * 📦 MongoDB Integration using Mongoose
+* 🚖 Captain Registration & Authentication
 
 ---
 
@@ -51,16 +52,16 @@ RideBuddy/
 │
 ├── controllers/
 │   └── user.controller.js
-│
+│   └── captain.controller.js
 ├── models/
 │   └── user.model.js
-│
+│   └── captain.model.js
 ├── routes/
 │   └── user.routes.js
-│
+│   └── captain.routes.js
 ├── services/
 │   └── user.service.js
-│
+│   └── captain.service.js
 ├── middleware/
 │   └── auth.middleware.js
 │
@@ -319,6 +320,174 @@ Cookie: token=<token>
 
 ---
 
+````md
+---
+
+# 🚖 Captain Authentication APIs
+
+# 🚖 Captain Registration
+
+## Endpoint
+
+```http
+POST /captains/register
+````
+
+---
+
+## 📖 Description
+
+Registers a new captain (driver) in the RideBuddy platform.
+
+The API performs:
+
+* ✅ Request Validation
+* 🔒 Password Hashing using bcrypt
+* 🚘 Vehicle Information Validation
+* 🗄️ MongoDB Record Creation
+* 🔑 JWT Token Generation
+
+On successful registration, the server returns an authentication token along with captain details.
+
+---
+
+## 🧾 Request Body
+
+```json
+{
+  "fullName": {
+    "firstName": "Jane",
+    "lastName": "Smith"
+  },
+  "email": "jane.smith@example.com",
+  "password": "securePassword456",
+  "vehicle": {
+    "color": "White",
+    "plate": "ABC-1234",
+    "capacity": 4,
+    "type": "car"
+  }
+}
+```
+
+---
+
+## ✅ Validation Rules
+
+### 👤 Captain Details
+
+| Field              | Type   | Validation           |
+| ------------------ | ------ | -------------------- |
+| fullName.firstName | String | Minimum 2 characters |
+| fullName.lastName  | String | Optional             |
+| email              | String | Valid & unique email |
+| password           | String | Minimum 6 characters |
+
+---
+
+### 🚘 Vehicle Details
+
+| Field            | Type   | Validation                                  |
+| ---------------- | ------ | ------------------------------------------- |
+| vehicle.color    | String | Minimum 3 characters                        |
+| vehicle.plate    | String | Minimum 3 characters                        |
+| vehicle.capacity | Number | Minimum value: 1                            |
+| vehicle.type     | String | Must be `car`, `bike`, `scooter`, or `auto` |
+
+---
+
+## ✅ Success Response — 201 Created
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "67a36f...",
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Smith"
+    },
+    "email": "jane.smith@example.com",
+    "status": "inactive",
+    "vehicle": {
+      "color": "White",
+      "plate": "ABC-1234",
+      "capacity": 4,
+      "type": "car"
+    }
+  }
+}
+```
+
+---
+
+## ❌ Validation Error — 400 Bad Request
+
+Returned when:
+
+* Required fields are missing
+* Validation rules fail
+* Email already exists
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Vehicle type must be one of: car, bike, scooter, auto",
+      "param": "vehicle.type",
+      "location": "body"
+    }
+  ]
+}
+```
+
+---
+
+# 🔒 Security & Data Handling
+
+## ✅ Password Encryption
+
+Captain passwords are securely hashed using bcrypt before storing them in MongoDB.
+
+---
+
+## ✅ JWT Authentication
+
+A JWT token is generated upon successful registration using the `JWT_SECRET` environment variable.
+
+The token is used for authenticated access to protected captain routes.
+
+---
+
+## ✅ Token Expiration & Blacklisting
+
+* Tokens expire after 24 hours
+* Blacklisted tokens are automatically removed using MongoDB TTL indexes
+
+---
+
+# 🧠 Captain Registration Workflow
+
+```text
+Captain Registration Request
+           ↓
+Request Validation
+           ↓
+Password Hashing
+           ↓
+Vehicle Validation
+           ↓
+MongoDB Storage
+           ↓
+JWT Token Generation
+           ↓
+Authenticated Captain Access
+```
+
+```
+```
+
+
 # 🛡️ Authentication Flow
 
 ```text
@@ -436,7 +605,6 @@ You can test the APIs using:
 * 📍 Real-time Location Tracking
 * 💬 Socket.IO Chat Integration
 * 🧭 Google Maps Integration
-* 👨‍✈️ Captain Authentication System
 * 📱 OTP Verification
 * ☁️ Deployment on AWS / Render / Railway
 
@@ -448,13 +616,6 @@ Contributions are welcome.
 
 Feel free to fork the repository and submit pull requests.
 
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
-
----
 
 # 👨‍💻 Author
 
