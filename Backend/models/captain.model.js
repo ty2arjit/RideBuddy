@@ -24,6 +24,7 @@ const captainSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: [6, 'Password must be at least 6 characters long'],
+    select: false,
   },
   socketId: {
     type: String,
@@ -33,7 +34,7 @@ const captainSchema = new mongoose.Schema({
     enum: ['active', 'inactive'],
     default: 'inactive',
   },
-  vechile: {
+  vehicle: {
     color:{
       type: String,
       required: true,
@@ -67,6 +68,8 @@ const captainSchema = new mongoose.Schema({
 
 captainSchema.methods.generateAuthToken = function() {
   const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+  return token;
 }
 
 captainSchema.methods.comparePassword = async function( enteredPassword ) {
