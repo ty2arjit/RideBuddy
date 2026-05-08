@@ -325,19 +325,23 @@ Cookie: token=<token>
 
 # 🚖 Captain Authentication APIs
 
+This section documents all authentication-related endpoints for Captains (drivers).
+
+---
+
 # 🚖 Captain Registration
 
 ## Endpoint
 
 ```http
 POST /captains/register
-````
+```
 
 ---
 
 ## 📖 Description
 
-Registers a new captain (driver) in the RideBuddy platform.
+Registers a new captain along with vehicle details.
 
 The API performs:
 
@@ -357,42 +361,18 @@ On successful registration, the server returns an authentication token along wit
 {
   "fullName": {
     "firstName": "Jane",
-    "lastName": "Smith"
+    "lastName": "Doe"
   },
-  "email": "jane.smith@example.com",
-  "password": "securePassword456",
+  "email": "jane@example.com",
+  "password": "securepassword123",
   "vehicle": {
-    "color": "White",
+    "color": "Silver",
     "plate": "ABC-1234",
     "capacity": 4,
     "type": "car"
   }
 }
 ```
-
----
-
-## ✅ Validation Rules
-
-### 👤 Captain Details
-
-| Field              | Type   | Validation           |
-| ------------------ | ------ | -------------------- |
-| fullName.firstName | String | Minimum 2 characters |
-| fullName.lastName  | String | Optional             |
-| email              | String | Valid & unique email |
-| password           | String | Minimum 6 characters |
-
----
-
-### 🚘 Vehicle Details
-
-| Field            | Type   | Validation                                  |
-| ---------------- | ------ | ------------------------------------------- |
-| vehicle.color    | String | Minimum 3 characters                        |
-| vehicle.plate    | String | Minimum 3 characters                        |
-| vehicle.capacity | Number | Minimum value: 1                            |
-| vehicle.type     | String | Must be `car`, `bike`, `scooter`, or `auto` |
 
 ---
 
@@ -405,12 +385,12 @@ On successful registration, the server returns an authentication token along wit
     "_id": "67a36f...",
     "fullName": {
       "firstName": "Jane",
-      "lastName": "Smith"
+      "lastName": "Doe"
     },
-    "email": "jane.smith@example.com",
+    "email": "jane@example.com",
     "status": "inactive",
     "vehicle": {
-      "color": "White",
+      "color": "Silver",
       "plate": "ABC-1234",
       "capacity": 4,
       "type": "car"
@@ -427,13 +407,13 @@ Returned when:
 
 * Required fields are missing
 * Validation rules fail
-* Email already exists
+* Captain already exists
 
 ```json
 {
   "errors": [
     {
-      "msg": "Vehicle type must be one of: car, bike, scooter, auto",
+      "msg": "Validation failed",
       "param": "vehicle.type",
       "location": "body"
     }
@@ -443,48 +423,260 @@ Returned when:
 
 ---
 
-# 🔒 Security & Data Handling
+# 🔑 Captain Login
+
+## Endpoint
+
+```http
+POST /captains/login
+```
+
+---
+
+## 📖 Description
+
+Authenticates a captain using email and password.
+
+On successful authentication:
+
+* A JWT token is generated
+* Token is sent in cookies and response body
+* Captain details are returned
+
+---
+
+## 🧾 Request Body
+
+```json
+{
+  "email": "jane@example.com",
+  "password": "securepassword123"
+}
+```
+
+---
+
+## ✅ Success Response — 200 OK
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "67a36f...",
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Doe"
+    },
+    "email": "jane@example.com"
+  }
+}
+```
+
+---
+
+## ❌ Invalid Credentials — 400 Bad Request
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+---
+
+# 👤 Captain Profile
+
+## Endpoint
+
+```http
+GET /captains/profile
+```
+
+---
+
+## 📖 Description
+
+Retrieves the profile information of the currently authenticated captain.
+
+---
+
+## 🔒 Authentication Required
+
+Yes ✅
+
+Provide JWT token using:
+
+```http
+Authorization: Bearer <token>
+```
+
+OR
+
+```http
+Cookie: token=<token>
+```
+
+---
+
+## ✅ Success Response — 200 OK
+
+```json
+{
+  "captain": {
+    "_id": "67a36f...",
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Doe"
+    },
+    "email": "jane@example.com",
+    "vehicle": {
+      "color": "Silver",
+      "plate": "ABC-1234",
+      "capacity": 4,
+      "type": "car"
+    }
+  }
+}
+```
+
+---
+
+## ❌ Unauthorized — 401
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+# 🚪 Captain Logout
+
+## Endpoint
+
+```http
+POST /captains/logout
+```
+
+---
+
+## 📖 Description
+
+Logs out the authenticated captain by:
+
+* Blacklisting the JWT token
+* Clearing authentication cookies
+
+Once logged out:
+
+* The token becomes invalid
+* Protected routes cannot be accessed
+
+---
+
+## 🔒 Authentication Required
+
+Yes ✅
+
+---
+
+## 📨 Request Headers
+
+```http
+Authorization: Bearer <token>
+```
+
+OR
+
+```http
+Cookie: token=<token>
+```
+
+---
+
+## ✅ Success Response — 200 OK
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+---
+
+## ❌ Unauthorized — 401
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+# 🚘 Supported Vehicle Types
+
+* car
+* bike
+* scooter
+* auto
+
+---
+
+# ✅ Validation Rules
+
+| Field              | Validation                 |
+| ------------------ | -------------------------- |
+| Email              | Must be valid email format |
+| Password           | Minimum 6 characters       |
+| fullName.firstName | Minimum 2 characters       |
+| vehicle.color      | Minimum 3 characters       |
+| vehicle.plate      | Minimum 3 characters       |
+| vehicle.capacity   | Minimum value: 1           |
+
+---
+
+# 🔒 Security Features
 
 ## ✅ Password Encryption
 
-Captain passwords are securely hashed using bcrypt before storing them in MongoDB.
+Passwords are securely hashed using bcrypt before storing them in MongoDB.
 
 ---
 
 ## ✅ JWT Authentication
 
-A JWT token is generated upon successful registration using the `JWT_SECRET` environment variable.
-
-The token is used for authenticated access to protected captain routes.
+JSON Web Tokens are used for secure stateless authentication.
 
 ---
 
-## ✅ Token Expiration & Blacklisting
+## ✅ Token Blacklisting
 
-* Tokens expire after 24 hours
-* Blacklisted tokens are automatically removed using MongoDB TTL indexes
+Logged-out tokens are stored in a blacklist collection to prevent reuse.
 
 ---
 
-# 🧠 Captain Registration Workflow
+## ✅ TTL Index Cleanup
+
+Blacklisted tokens are automatically deleted after expiration using MongoDB TTL indexes.
+
+---
+
+# 🧠 Captain Authentication Workflow
 
 ```text
-Captain Registration Request
-           ↓
+Captain Request
+       ↓
 Request Validation
-           ↓
+       ↓
 Password Hashing
-           ↓
-Vehicle Validation
-           ↓
-MongoDB Storage
-           ↓
-JWT Token Generation
-           ↓
-Authenticated Captain Access
-```
-
-```
+       ↓
+JWT Generation
+       ↓
+Authenticated Access
+       ↓
+Logout & Token Blacklisting
 ```
 
 
